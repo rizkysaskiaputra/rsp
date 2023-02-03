@@ -1,0 +1,47 @@
+---
+import { SITE } from '~/config'
+import type { OpenGraph } from '~/types'
+
+export interface Props {
+  og: OpenGraph
+}
+const { og } = Astro.props as Props
+
+const lang = og.lang ?? SITE.lang
+const title = og.title ?? SITE.title
+const description = og.description ?? SITE.description
+const canonical = new URL(Astro.url.pathname, Astro.url.origin)
+const image = og.image?.src ?? SITE.image.src
+const imageSrc = new URL(image, Astro.url.origin)
+const imageAlt = og.image?.alt ?? SITE.image.alt
+const imageHeight = og.image?.height ?? SITE.image.height
+const imageWidth = og.image?.width ?? SITE.image.width
+const imageType = og.image?.type ?? SITE.image.type
+const cardType = og.cardType ?? 'summary_large_image'
+const pageType = og.pageType ?? 'website'
+---
+
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width" />
+<meta name="generator" content={Astro.generator} />
+<meta name="theme-color" content={SITE.themeColor} />
+<title>{title}</title>
+<meta name="description" content={description} />
+<link rel="canonical" href={canonical} />
+<meta property="og:url" content={canonical} />
+<meta property="og:type" content={pageType} />
+<meta property="og:title" content={title} />
+<meta property="og:description" content={description} />
+<meta property="og:image" content={imageSrc} />
+<meta property="og:image:alt" content={imageAlt} />
+<meta property="og:image:height" content={imageHeight} />
+<meta property="og:image:width" content={imageWidth} />
+<meta property="og:image:type" content={imageType} />
+<meta property="og:site_name" content={SITE.title} />
+<meta property="og:locale" content={lang} />
+<meta name="twitter:card" content={cardType} />
+<meta name="twitter:site" content={SITE.social.twitter} />
+<meta property="twitter:title" content={title} />
+<meta property="twitter:description" content={description} />
+<meta property="twitter:image" content={imageSrc} />
+<meta property="twitter:image:alt" content={imageAlt} />

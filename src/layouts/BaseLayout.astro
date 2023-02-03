@@ -1,0 +1,21 @@
+---
+import BaseHead from '~/components/BaseHead.astro'
+
+import { SITE } from '~/config'
+import type { OpenGraph } from '~/types'
+
+export interface Props {
+  og: OpenGraph
+}
+const { og } = Astro.props as Props
+---
+
+<html dir={SITE.dir} lang={SITE.lang}>
+  <head>
+    <BaseHead og={og} />
+  </head>
+  <body>
+    <a href="/">Home</a>
+    <slot />
+  </body>
+</html>

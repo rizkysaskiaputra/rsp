@@ -1,0 +1,29 @@
+---
+import Layout from '~/layouts/BaseLayout.astro'
+
+import { fetchPosts } from '~/utils/blog'
+
+const { blog } = Astro.params
+
+const pages = await fetchPosts()
+const page = pages.find((page) => page.slug === blog)
+if (!page) return Astro.redirect('/404')
+
+const { title, description, readingTime, Content, content } = page
+---
+
+<Layout og={page}>
+  <h1>{title}</h1>
+  <p>{description}</p>
+  <p>{`${readingTime} min read`}</p>
+  {
+    Content ? (
+      <>
+        {/* @ts-ignore */}
+        <Content />
+      </>
+    ) : (
+      <Fragment set:html={content} />
+    )
+  }
+</Layout>
