@@ -1,0 +1,76 @@
+---
+import Layout from '~/layouts/BaseLayout.astro'
+
+import { fetchPosts } from '~/utils/blog'
+
+interface Pagination<T> {
+  page: {
+    data: T[]
+    start: number
+    end: number
+    size: number
+    total: number
+  }
+  pagination: Array<number>
+}
+
+// custom pagination with url parameter blog?page=number
+function paginate<T>(page: T[], pageNumber: number, pageSize: number): Pagination<T> {
+  const startIndex = (pageNumber - 1) * pageSize
+  const endIndex = Math.ceil(page.length / pageSize)
+  const items = page.slice(startIndex, startIndex + pageSize)
+
+  const pagination = Array.from({ length: endIndex - startIndex }, (_, i) => i)
+  return {
+    page: {
+      data: items,
+      start: pageNumber,
+      end: endIndex,
+      size: pageSize,
+      total: page.length,
+    },
+    pagination: pagination,
+  }
+}
+
+const posts = await fetchPosts()
+
+// https://developer.mozilla.org/en-US/docs/Web/API/URLSearchParams
+const url = new URL(Astro.request.url)
+const params = new URLSearchParams(url.search)
+
+let getPage
+if (params.get('page') !== null) {
+  getPage = paginate(posts, Number(params.get('page')), 1)
+} else {
+  getPage = paginate(posts, 1, 1)
+}
+
+const { page, pagination } = getPage
+
+// return error
+if (page.start > page.end) return Astro.redirect('/404')
+---
+
+<Layout og={{ title: 'Blog', description: 'Test alternative getStaticPaths', canonical: url }}>
+  <pre>url params: ./blog?page={params.get('page')||`number`}</pre>
+  <p>{`start: ${page.start}, end: ${page.end}, size: ${page.size}, total: ${page.total}`}</p>
+  <ul>
+    {
+      page.data.map((post) => (
+        <li>
+          <a href={`/${post.slug}/`}>{post.title}</a>
+        </li>
+      ))
+    }
+  </ul>
+  <ul>
+    {
+      pagination.map((next) => (
+        <li>
+          <a href={`/blog/?page=${next + 1}`}>page: {next + 1}</a>
+        </li>
+      ))
+    }
+  </ul>
+</Layout>
